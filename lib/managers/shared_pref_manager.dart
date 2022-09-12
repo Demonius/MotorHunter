@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SharedPrefManager {
   static const String STATE_AUTH = "state_auth";
   static const String USER_ID = "user_id";
+  static const String AUTH = "auth";
 
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 
@@ -30,5 +31,17 @@ class SharedPrefManager {
 
   FutureOr<bool> Function(SharedPreferences pref) getBoolValue(String key) {
     return (pref) => pref.getBool(key) ?? false;
+  }
+
+  FutureOr<String> Function(SharedPreferences pref) getStringValue(String key) {
+    return (pref) => pref.getString(key) ?? "";
+  }
+
+  Future<bool> saveAuthorization(String berear) async {
+    return (await _prefs).setString(AUTH, berear).then((bool success) => success);
+  }
+
+  Future<String> getAuthorization() {
+    return _prefs.then(getStringValue(AUTH));
   }
 }

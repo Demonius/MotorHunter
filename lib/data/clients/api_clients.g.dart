@@ -6,7 +6,7 @@ part of 'api_clients.dart';
 // RetrofitGenerator
 // **************************************************************************
 
-// ignore_for_file: unnecessary_brace_in_string_interps
+// ignore_for_file: unnecessary_brace_in_string_interps,no_leading_underscores_for_local_identifiers
 
 class _ApiClient implements ApiClient {
   _ApiClient(this._dio, {this.baseUrl}) {
@@ -37,13 +37,13 @@ class _ApiClient implements ApiClient {
   }
 
   @override
-  Future<List<Offer>> getListOffers(userId) async {
+  Future<List<OfferResponse>> getListOffers(userId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = {'suppler_id': userId};
-    final _result = await _dio.fetch<List<dynamic>>(_setStreamType<List<Offer>>(
-        Options(
+    final _result = await _dio.fetch<List<dynamic>>(
+        _setStreamType<List<OfferResponse>>(Options(
                 method: 'POST',
                 headers: _headers,
                 extra: _extra,
@@ -52,19 +52,19 @@ class _ApiClient implements ApiClient {
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     var value = _result.data!
-        .map((dynamic i) => Offer.fromJson(i as Map<String, dynamic>))
+        .map((dynamic i) => OfferResponse.fromJson(i as Map<String, dynamic>))
         .toList();
     return value;
   }
 
   @override
-  Future<Offer> getOffer(offerId, userId) async {
+  Future<OfferResponse> getOffer(offerId, userId) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
     final _data = {'offer_id': offerId, 'supplier_id': userId};
     final _result = await _dio.fetch<Map<String, dynamic>>(
-        _setStreamType<Offer>(Options(
+        _setStreamType<OfferResponse>(Options(
                 method: 'POST',
                 headers: _headers,
                 extra: _extra,
@@ -72,12 +72,12 @@ class _ApiClient implements ApiClient {
             .compose(_dio.options, 'offer/getOne',
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
-    final value = Offer.fromJson(_result.data!);
+    final value = OfferResponse.fromJson(_result.data!);
     return value;
   }
 
   @override
-  Future<CreatedOffer> createOffer(userId, uploadFile) async {
+  Future<CreatedOffer> createOffer(userId, uploadFile, description) async {
     const _extra = <String, dynamic>{};
     final queryParameters = <String, dynamic>{};
     final _headers = <String, dynamic>{};
@@ -87,6 +87,7 @@ class _ApiClient implements ApiClient {
         'license_plate',
         MultipartFile.fromFileSync(uploadFile.path,
             filename: uploadFile.path.split(Platform.pathSeparator).last)));
+    _data.fields.add(MapEntry('supplier_comment', description));
     final _result = await _dio.fetch<Map<String, dynamic>>(
         _setStreamType<CreatedOffer>(Options(
                 method: 'POST',
@@ -97,6 +98,29 @@ class _ApiClient implements ApiClient {
                 queryParameters: queryParameters, data: _data)
             .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
     final value = CreatedOffer.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<ApproveOffer> approveOfferPrice(offerId, approve, comment) async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{};
+    final _data = {
+      'offer_id': offerId,
+      'approve': approve,
+      'supplier_comment': comment
+    };
+    final _result = await _dio.fetch<Map<String, dynamic>>(
+        _setStreamType<ApproveOffer>(Options(
+                method: 'POST',
+                headers: _headers,
+                extra: _extra,
+                contentType: 'application/x-www-form-urlencoded')
+            .compose(_dio.options, 'offer/approve',
+                queryParameters: queryParameters, data: _data)
+            .copyWith(baseUrl: baseUrl ?? _dio.options.baseUrl)));
+    final value = ApproveOffer.fromJson(_result.data!);
     return value;
   }
 

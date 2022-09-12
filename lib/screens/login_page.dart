@@ -67,8 +67,7 @@ class _AuthPage extends State<AuthPage> {
       enabledInput = false;
       loadingState = true;
     });
-    ApisMock().loginUser(login, password).then((user) {
-      print("logged user => $user");
+    Apis().loginUser(login, password).then((user) {
       FocusManager.instance.primaryFocus?.unfocus();
       Navigator.pushReplacement(context, CupertinoPageRoute(builder: (context) => const HomePage()));
     }).catchError((error) {
@@ -113,6 +112,7 @@ class _AuthPage extends State<AuthPage> {
               child: TextField(
                 onChanged: _onLoginTextChange,
                 enabled: enabledInput,
+                keyboardType: TextInputType.emailAddress,
                 textInputAction: TextInputAction.next,
                 decoration: const InputDecoration(
                     icon: Icon(Icons.login), hintText: StringResources.textHintLogin, helperText: StringResources.textHelperLogin),
@@ -123,6 +123,7 @@ class _AuthPage extends State<AuthPage> {
                 onChanged: _onPasswordTextChange,
                 obscureText: true,
                 enabled: enabledInput,
+                keyboardType: TextInputType.visiblePassword,
                 textInputAction: TextInputAction.done,
                 onSubmitted: _onSubmitLogin,
                 decoration: const InputDecoration(

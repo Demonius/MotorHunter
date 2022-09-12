@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:motor_hunter/data/api/rest_api.dart';
 import 'package:motor_hunter/managers/shared_pref_manager.dart';
 import 'package:motor_hunter/screens/home_page.dart';
 import 'package:motor_hunter/screens/login_page.dart';
@@ -39,6 +40,7 @@ class _StartPage extends State<StartPage> {
   }
 
   void initialize() {
+    Apis.initBaseService();
     stateAuth = SharedPrefManager().getStateAuthUser();
   }
 

@@ -1,17 +1,22 @@
 import 'dart:typed_data';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:motor_hunter/base/dialog_with_photo.dart';
 import 'package:motor_hunter/constants/string_constants.dart';
+import 'package:motor_hunter/data/api/models/response/error_model.dart';
 import 'package:motor_hunter/screens/login_page.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 import '../base/styles.dart';
 import '../base/widgets.dart';
-import '../data/api/models/offer_model.dart';
+import '../data/api/models/object/offer_model.dart';
+import '../data/api/models/response/offer_model_response.dart';
 import '../data/api/rest_api.dart';
+import '../data/clients/mappers.dart';
 import '../managers/shared_pref_manager.dart';
 import 'order_page.dart';
 
@@ -37,11 +42,20 @@ class _HomePage extends State<HomePage> {
 
   void _addNewOffer() async {
     final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
-    final Uint8List? photoRaw = await photo?.readAsBytes();
-    print("photo path => ${photo?.path} plus photoRaw => ${photoRaw?.isNotEmpty}");
     if (photo == null) return;
 
-    final CreatedOffer offer = await ApisMock().createOffer(photo.path);
+    showApplyDialogCreteOffer(photo);
+  }
+
+  void showApplyDialogCreteOffer(XFile photo) async {
+    String title = StringResources.titleDialogCreateOffer;
+    String description = StringResources.messageDialogCreateOffer;
+    bool stateApproveResult = await showDialog(
+      barrierDismissible: false,
+        context: context, builder: (BuildContext context) => DialogWithPhoto(title: title, description: description, pathPhoto: photo.path));
+    if (stateApproveResult) {
+      _onRefresh();
+    }
   }
 
   void _logout() {
@@ -84,7 +98,7 @@ class _HomePage extends State<HomePage> {
   }
 
   void _onLoading() {
-    itemsFuture = ApisMock().getListOffers();
+    itemsFuture = Apis().getListOffers();
     itemsFuture.then((value) {
       setState(() {
         items.addAll(value);
@@ -95,8 +109,16 @@ class _HomePage extends State<HomePage> {
         }
       });
     }).catchError((error) {
-      errorMessage = error.toString();
+      catchErrorListOffer(error);
       _refreshController.loadFailed();
+    });
+  }
+
+  void catchErrorListOffer(DioError error) {
+    ErrorModel errorModel = Mappers().mapErrorState(error);
+    setState(() {
+      hasError = true;
+      errorMessage = errorModel.message ?? "";
     });
   }
 
@@ -107,7 +129,7 @@ class _HomePage extends State<HomePage> {
       hasError = false;
       hasEmptyOrder = false;
     });
-    itemsFuture = ApisMock().getListOffers();
+    itemsFuture = Apis().getListOffers();
     itemsFuture.then((value) {
       setState(() {
         hasEmptyOrder = value.isEmpty;
@@ -121,10 +143,7 @@ class _HomePage extends State<HomePage> {
         isInitializationState = false;
       }
     }).catchError((error) {
-      setState(() {
-        hasError = true;
-        errorMessage = error.toString();
-      });
+      catchErrorListOffer(error);
       _refreshController.refreshFailed();
       if (isInitializationState) {
         FlutterNativeSplash.remove();
@@ -135,15 +154,8 @@ class _HomePage extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget actionExit = Padding(
-        padding: const EdgeInsets.only(right: 20.0),
-        child: GestureDetector(
-          onTap: _logout,
-          child: const Icon(
-            Icons.logout,
-            size: 26.0,
-          ),
-        ));
+    Widget actionExit =
+        Padding(padding: const EdgeInsets.only(right: 20.0), child: GestureDetector(onTap: _logout, child: const Icon(Icons.logout, size: 26.0)));
 
     return Scaffold(
         appBar: defaultAppBar(actions: [actionExit]),
@@ -179,7 +191,7 @@ class _HomePage extends State<HomePage> {
             onLoading: _onLoading,
             child: ListView.builder(
               itemBuilder: (c, i) => showElementList(i),
-              itemExtent: (hasError || hasEmptyOrder) ? constraints.maxHeight : 50.0,
+              itemExtent: (hasError || hasEmptyOrder) ? constraints.maxHeight : 100.0,
               itemCount: (hasError || hasEmptyOrder) ? 1 : items.length,
             ),
           );
@@ -194,8 +206,24 @@ class _HomePage extends State<HomePage> {
     } else {
       return GestureDetector(
         child: createCardOffer(items[index]),
-        onTap: () {
-          Navigator.push(context, CupertinoPageRoute(builder: (_) => OrderPage(order: items[index])));
+        onTap: () async {
+          List<int> listNotOpenId = List.generate(3, (index) {
+            switch (index) {
+              case 0:
+                return 3;
+              case 1:
+                return 6;
+              default:
+                return 8;
+            }
+          });
+
+          if (!listNotOpenId.contains(items[index].idStatus)) {
+            var result = await Navigator.push(context, CupertinoPageRoute(builder: (_) => OrderPage(order: items[index])));
+            if (result) {
+              _onRefresh();
+            }
+          }
         },
       );
     }
@@ -203,26 +231,32 @@ class _HomePage extends State<HomePage> {
 
   Widget createCardOffer(Offer offer) {
     return Card(
-        child: Column(
-      children: [
-        createWidgetTitleValue("Status:", offer.status),
-        const SizedBox(
-          height: 5.0,
-        ),
-        createWidgetTitleValue("Comment:", offer.comment)
-      ],
-    ));
-  }
-
-  Widget showErrorScreen(String error) {
-    return Center(
-      child: Text(error),
-    );
+        child: Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Row(children: [
+              imageFromExternal(offer.image, height: 90.0),
+              const SizedBox(width: 12.0),
+              Expanded(
+                  child: Column(
+                children: [
+                  createWidgetTitleValue("License plate:", offer.licensePlate),
+                  const SizedBox(height: 5.0),
+                  createWidgetTitleValue("Status:", offer.messageStatus),
+                  const SizedBox(height: 5.0),
+                  const Spacer(),
+                  Align(alignment: Alignment.bottomRight, child: Text(Mappers().convertDateToString(offer.createdAt)))
+                ],
+              ))
+            ])));
   }
 
   Widget showEmptyScreen() {
-    return const Center(
-      child: Text(StringResources.messageEmptyOrder),
-    );
+    return showTextWithIcon(
+        const Icon(
+          Icons.hourglass_empty,
+          color: primaryColor,
+          size: 50.0,
+        ),
+        StringResources.messageEmptyOrder);
   }
 }

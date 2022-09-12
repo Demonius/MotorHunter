@@ -2,11 +2,18 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:motor_hunter/data/api/models/offer_model.dart';
+import 'package:dio_logging_interceptor/dio_logging_interceptor.dart';
+import 'package:motor_hunter/data/api/models/response/error_model.dart';
+import 'package:motor_hunter/data/api/models/response/offer_model_response.dart';
+import 'package:motor_hunter/data/clients/mappers.dart';
 import 'package:motor_hunter/managers/shared_pref_manager.dart';
 
 import '../clients/api_clients.dart';
-import 'models/user_model.dart';
+import 'models/object/offer_model.dart';
+import 'models/response/approve_offer.dart';
+import 'models/response/user_model.dart';
+
+const String AUTH_BEREAR = "Authorization";
 
 class Apis {
   static const String login = "supplier/login";
@@ -14,54 +21,64 @@ class Apis {
   static const String offer = "offer/getOne";
   static const String create = "offer/create";
   static const String update = "offer/update";
+  static const String price_approve = "offer/approve";
 
-  static final BaseOptions baseOptions =
-      BaseOptions(contentType: "application/json", followRedirects: true, connectTimeout: 9000, receiveTimeout: 9000);
-  static final Dio dio = Dio(baseOptions);
-  final client = ApiClient(dio);
-  final SharedPrefManager prefManager = SharedPrefManager();
+  static late BaseOptions baseOptions;
+  static late Dio dio;
+  static late ApiClient client;
+  static SharedPrefManager prefManager = SharedPrefManager();
 
-  Future<User> loginUser(String email, String password) => client.authenticateUser(email, password).then((User user) {
-        prefManager.setStateAuthUser(true);
-        prefManager.setUserId(user.id);
-        return user;
-      });
+  static void initBaseService() async {
+    baseOptions = BaseOptions(contentType: "application/json", followRedirects: true, connectTimeout: 9000, receiveTimeout: 9000);
+    dio = Dio(baseOptions);
+    dio.interceptors.add(DioLoggingInterceptor(level: Level.body, compact: false));
+    dio.interceptors.add(MotorHunterInterceptor());
+    client = ApiClient(dio);
+  }
 
-  Future<List<Offer>> getOffers() => prefManager.getCurrentUserId().then((int userId) => client.getListOffers(userId));
+  Future<User> loginUser(String email, String password) {
+    return client.authenticateUser(email, password).then((User user) {
+      var stringBufferAuthorization = StringBuffer();
+      stringBufferAuthorization.write(user.tokenType);
+      stringBufferAuthorization.write(" ");
+      stringBufferAuthorization.write(user.token);
+      var barear = stringBufferAuthorization.toString();
+      prefManager.saveAuthorization(barear);
+      prefManager.setStateAuthUser(true);
+      prefManager.setUserId(user.id);
+      return user;
+    });
+  }
 
-  Future<Offer> getOffer(int offerId) => prefManager.getCurrentUserId().then((int userId) => client.getOffer(offerId, userId));
+  Future<List<Offer>> getListOffers() {
+    return prefManager.getCurrentUserId().then((int userId) =>
+        client.getListOffers(userId).then((List<OfferResponse> value) => value.map((offerResponse) => Mappers().mapOffers(offerResponse)).toList()));
+  }
 
-  Future<CreatedOffer> createOffer(String filePath) {
+  Future<OfferResponse> getOffer(int offerId) => prefManager.getCurrentUserId().then((int userId) => client.getOffer(offerId, userId));
+
+  Future<CreatedOffer> createOffer(String filePath, String description) {
     Uri uri = Uri.file(filePath);
     File file = File.fromUri(uri);
-    return prefManager.getCurrentUserId().then((int userId) => client.createOffer(userId, file));
+    return prefManager.getCurrentUserId().then((int userId) => client.createOffer(userId, file, description));
   }
+
+  Future<ApproveOffer> approveOfferPrice(int offerId, bool approve, String comment) => client.approveOfferPrice(offerId, approve ? 1 : 0, comment);
 }
 
-class ApisMock {
-  static const Duration duration = Duration(seconds: 2);
-  final SharedPrefManager prefManager = SharedPrefManager();
+class MotorHunterInterceptor extends Interceptor {
+  @override
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    SharedPrefManager prefManager = SharedPrefManager();
+    String auth = await prefManager.getAuthorization();
 
-  Future<User> loginUser(String email, String password) => Future.delayed(const Duration(seconds: 2), () {
-        return Future<User>.value(User(id: 1, roleId: 1, name: "UserMock", email: email, avatar: "", status: 1));
-      }).then((User user) {
-        prefManager.setStateAuthUser(true);
-        prefManager.setUserId(user.id);
-        return user;
-      });
+    options.headers.addAll({AUTH_BEREAR: auth});
 
-  Future<List<String>> getErrorListOffers() => Future.error("Error loading order");
+    super.onRequest(options, handler);
+  }
 
-  Future<List<Offer>> getListOffers() => Future.delayed(duration, () {
-        List<Offer> listOffer = List.generate(
-            3, (index) => Offer(id: 100, status: "new", comment: "index => $index", isRequestedMedia: false, hasMedia: false, price: index * 2.0));
-        return Future<List<Offer>>.value(listOffer);
-      });
-
-  Future<CreatedOffer> createOffer(String filePath) {
-    Uri uri = Uri.file(filePath);
-    File file = File.fromUri(uri);
-    return Future<CreatedOffer>.value(
-        CreatedOffer(isActive: true, image: "", offerStatusId: 3, apiStatusId: 1, comment: "new offer", userId: 1, id: 12));
+  @override
+  void onError(DioError err, ErrorInterceptorHandler handler) {
+    super.onError(err, handler);
   }
 }
