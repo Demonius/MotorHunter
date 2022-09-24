@@ -176,99 +176,100 @@ class _OrderPage extends State<OrderPage> {
       title: const Text(StringResources.titleDialogPriceApprove),
       content: SingleChildScrollView(
           child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(StringResources.descriptionDialogPriceApprove),
-          const SizedBox(
-            height: 8.0,
-          ),
-          TextField(
-            controller: controllerPrice,
-            keyboardType: TextInputType.number,
-            onChanged: _onPriceTextChange,
-            obscureText: false,
-            textInputAction: TextInputAction.done,
-          ),
-          SizedBox(
-              height: 120.0,
-              child: TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 7,
-                onChanged: _onDescriptionTextChange,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(StringResources.descriptionDialogPriceApprove),
+              const SizedBox(
+                height: 8.0,
+              ),
+              TextField(
+                controller: controllerPrice,
+                keyboardType: TextInputType.number,
+                onChanged: _onPriceTextChange,
+                obscureText: false,
                 textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(hintText: StringResources.textHintDescription, helperText: StringResources.textHelperPassword),
-              )),
-          Visibility(
-              visible: isApproveLoad,
-              child: const CupertinoActivityIndicator(
-                color: Colors.white,
-                radius: 12.0,
-              ))
-        ],
-      )),
+              ),
+              SizedBox(
+                  height: 120.0,
+                  child: TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 7,
+                    onChanged: _onDescriptionTextChange,
+                    textInputAction: TextInputAction.done,
+                    decoration: const InputDecoration(hintText: StringResources.textHintDescription, helperText: StringResources.textHelperPassword),
+                  )),
+              Visibility(
+                  visible: isApproveLoad,
+                  child: const CupertinoActivityIndicator(
+                    color: Colors.white,
+                    radius: 12.0,
+                  ))
+            ],
+          )),
       actions: [cancelButton, declineButton, approveButton],
     );
 
     showDialog(context: context, builder: (BuildContext context) => approveDialog);
   }
 
-  Widget setOfferData() => SmartRefresher(
-      enablePullDown: true,
-      header: const WaterDropHeader(
-        waterDropColor: primaryColor,
-      ),
-      controller: _refreshController,
-      onRefresh: _onRefresh,
-      child: ListView(
-        children: [
-          createWidgetTitleValue("Comment order:", order.managerComment ?? "No comment"),
-          const SizedBox(
-            height: 8.0,
+  Widget setOfferData() =>
+      SmartRefresher(
+          enablePullDown: true,
+          header: const WaterDropHeader(
+            waterDropColor: primaryColor,
           ),
-          createWidgetTitleValue("Status order:", order.messageStatus),
-          const SizedBox(
-            height: 8.0,
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
+          controller: _refreshController,
+          onRefresh: _onRefresh,
+          child: ListView(
             children: [
-              const Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Price order:",
-                    style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
-                  )),
+              createWidgetTitleValue("Comment order:", order.managerComment ?? "No comment"),
+              const SizedBox(
+                height: 8.0,
+              ),
+              createWidgetTitleValue("Status order:", order.messageStatus),
+              const SizedBox(
+                height: 8.0,
+              ),
               Row(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(order.price.toString()),
-                  order.idStatus == 4
-                      ? Visibility(
+                  const Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Price order:",
+                        style: TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
+                      )),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(order.price.toString()),
+                      order.idStatus == 4
+                          ? Visibility(
                           visible: isVisibleApproveButton,
                           child: TextButton(
                               style: stylePrimaryButton(100.0, DoubleConstants.minButtonHeight),
                               onPressed: _onClickApprovePrice,
                               child: const Text(StringResources.textApproveButton)))
-                      : Container()
+                          : Container()
+                    ],
+                  )
                 ],
-              )
+              ),
+              const SizedBox(
+                height: 8.0,
+              ),
+              createWidgetTitleValue("Manager comment", order.managerComment ?? "No comment"),
+              const SizedBox(
+                height: 4.0,
+              ),
+              createWidgetTitleValue("Supplier comment", order.supplierComment ?? "No comment"),
+              createPhotosWidget(),
+              Align(alignment: Alignment.topCenter, child: createVideoWidget()),
+              // const Padding(padding: EdgeInsets.only(left: 12.0, bottom: 4.0, top: 12.0), child: Text("Messages")),
+              // getWidgetListMessage(),
             ],
-          ),
-          const SizedBox(
-            height: 8.0,
-          ),
-          createWidgetTitleValue("Manager comment", order.managerComment ?? "No comment"),
-          const SizedBox(
-            height: 4.0,
-          ),
-          createWidgetTitleValue("Supplier comment", order.supplierComment ?? "No comment"),
-          createPhotosWidget(),
-          Align(alignment: Alignment.topCenter, child: createVideoWidget()),
-          // const Padding(padding: EdgeInsets.only(left: 12.0, bottom: 4.0, top: 12.0), child: Text("Messages")),
-          // getWidgetListMessage(),
-        ],
-      ));
+          ));
 
   Widget createPhotosWidget() {
     if (order.photos != null && order.photos?.isNotEmpty == true) {
@@ -356,35 +357,36 @@ class _OrderPage extends State<OrderPage> {
     }
   }
 
-  Widget getWidgetListMessage() => Expanded(
+  Widget getWidgetListMessage() =>
+      Expanded(
           child: SmartRefresher(
-        enablePullDown: true,
-        header: const WaterDropHeader(
-          waterDropColor: primaryColor,
-        ),
-        controller: _refreshController,
-        onRefresh: _onRefresh,
-        child: ListView.builder(
-          scrollDirection: Axis.vertical,
-          itemBuilder: (context, index) {
-            bool isPositionDivTwo = index % 2 == 0;
-            return Padding(
-                padding: EdgeInsets.only(left: isPositionDivTwo ? 0.0 : paddingMessage, right: isPositionDivTwo ? paddingMessage : 0.0),
-                child: Card(
-                  color: isPositionDivTwo ? Colors.brown : Colors.deepOrange,
-                  child: Padding(
-                      padding: const EdgeInsets.all(4.0),
-                      child: Container(
+            enablePullDown: true,
+            header: const WaterDropHeader(
+              waterDropColor: primaryColor,
+            ),
+            controller: _refreshController,
+            onRefresh: _onRefresh,
+            child: ListView.builder(
+              scrollDirection: Axis.vertical,
+              itemBuilder: (context, index) {
+                bool isPositionDivTwo = index % 2 == 0;
+                return Padding(
+                    padding: EdgeInsets.only(left: isPositionDivTwo ? 0.0 : paddingMessage, right: isPositionDivTwo ? paddingMessage : 0.0),
+                    child: Card(
+                      color: isPositionDivTwo ? Colors.brown : Colors.deepOrange,
+                      child: Padding(
                           padding: const EdgeInsets.all(4.0),
-                          alignment: isPositionDivTwo ? Alignment.centerLeft : Alignment.centerRight,
-                          child: Text(
-                            "message text => $index",
-                            style: const TextStyle(color: Colors.white),
-                          ))),
-                ));
-          },
-          itemExtent: 40.0,
-          itemCount: 5,
-        ),
-      ));
+                          child: Container(
+                              padding: const EdgeInsets.all(4.0),
+                              alignment: isPositionDivTwo ? Alignment.centerLeft : Alignment.centerRight,
+                              child: Text(
+                                "message text => $index",
+                                style: const TextStyle(color: Colors.white),
+                              ))),
+                    ));
+              },
+              itemExtent: 40.0,
+              itemCount: 5,
+            ),
+          ));
 }
