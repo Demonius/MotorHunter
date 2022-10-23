@@ -224,13 +224,12 @@ class _OrderPage extends State<OrderPage> {
       child: ListView(
         children: [
           createWidgetTitleValue("Comment order:", order.managerComment ?? "No comment"),
-          const SizedBox(
-            height: 8.0,
-          ),
+          // const SizedBox(
+          //   height: 8.0,
+          // ),
+          createDivider(),
           createWidgetTitleValue("Status order:", order.messageStatus, colorBorder: order.colorBorder),
-          const SizedBox(
-            height: 8.0,
-          ),
+          createDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -256,19 +255,22 @@ class _OrderPage extends State<OrderPage> {
               )
             ],
           ),
-          const SizedBox(
-            height: 8.0,
-          ),
+          createDivider(),
           createWidgetTitleValue("Manager comment", order.managerComment ?? "No comment"),
-          const SizedBox(
-            height: 4.0,
-          ),
+          createDivider(),
           createWidgetTitleValue("Supplier comment", order.supplierComment ?? "No comment"),
           createPhotosWidget(),
           Align(alignment: Alignment.topCenter, child: createVideoWidget()),
           // const Padding(padding: EdgeInsets.only(left: 12.0, bottom: 4.0, top: 12.0), child: Text("Messages")),
           // getWidgetListMessage(),
         ],
+      ));
+
+  Widget createDivider() => const Padding(
+      padding: EdgeInsets.only(top: 4.0, bottom: 4.0),
+      child: Divider(
+        height: 2,
+        color: Colors.black54,
       ));
 
   Widget createPhotosWidget() {
