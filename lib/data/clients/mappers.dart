@@ -20,7 +20,9 @@ class Mappers {
       video: offerResponse.video ?? "",
       price: offerResponse.price,
       messageStatus: offerResponse.statusMessage,
-      idStatus: offerResponse.mobileStatus);
+      idStatus: offerResponse.mobileStatus,
+      uiState: UiState.borderColor,
+      colorBorder: 0xFFF44336);//0xFFF44336
 
   String convertDateToString(DateTime currentDateTime) {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
@@ -50,11 +52,11 @@ class Mappers {
   ErrorModel mapErrorState(DioError error) {
     int? statusCode = error.response?.statusCode ?? -1;
     String message = error.error.toString() ?? "";
-    ErrorResponseState status = ErrorResponseState.OTHER;
+    ErrorResponseState status = ErrorResponseState.other;
     if (statusCode >= 400 && statusCode < 500) {
-      status = ErrorResponseState.CLIENT_ERROR;
+      status = ErrorResponseState.clientError;
     } else if (statusCode >= 500) {
-      status = ErrorResponseState.SERVER_ERROR;
+      status = ErrorResponseState.serverError;
     }
     return ErrorModel(message: message, code: statusCode, status: status);
   }

@@ -16,21 +16,28 @@ class Offer {
   double? price;
   String messageStatus;
   int idStatus;
+  UiState uiState;
+  int? colorBorder;
 
-  Offer({required this.id,
-    required this.image,
-    required this.licensePlate,
-    required this.createdAt,
-    required this.isRequestedMedia,
-    this.managerComment,
-    this.supplierComment,
-    this.photos,
-    this.video,
-    this.price,
-    required this.messageStatus,
-    required this.idStatus});
+  Offer(
+      {required this.id,
+      required this.image,
+      required this.licensePlate,
+      required this.createdAt,
+      required this.isRequestedMedia,
+      this.managerComment,
+      this.supplierComment,
+      this.photos,
+      this.video,
+      this.price,
+      required this.messageStatus,
+      required this.idStatus,
+      this.uiState = UiState.basic,
+      this.colorBorder});
 
   factory Offer.fromJson(Map<String, dynamic> json) => _$OfferFromJson(json);
 
   Map<String, dynamic> toJson() => _$OfferToJson(this);
 }
+
+enum UiState { basic, notActive, borderColor }

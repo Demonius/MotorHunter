@@ -1,4 +1,4 @@
-enum ErrorResponseState { CLIENT_ERROR, SERVER_ERROR, NO_CONNECTION, OTHER }
+enum ErrorResponseState { clientError, serverError, noConnection, other }
 
 class ErrorModel {
   String? message;

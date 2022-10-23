@@ -34,21 +34,32 @@ void showErrorSnackBar(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-Widget createWidgetTitleValue(String title, String value) {
+Widget createWidgetTitleValue(String title, String value, {CrossAxisAlignment alignment = CrossAxisAlignment.end, int? colorBorder}) {
   return Row(
+    verticalDirection: VerticalDirection.up,
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    crossAxisAlignment: CrossAxisAlignment.end,
+    crossAxisAlignment: alignment,
     children: [
       Text(
         title,
         style: const TextStyle(color: Colors.cyan, fontWeight: FontWeight.bold),
       ),
-      Text(value)
+      const SizedBox(
+        width: 8.0,
+      ),
+      Expanded(
+        child: Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              value,
+              style: TextStyle(color: colorBorder != null ? Color(colorBorder) : Colors.black),
+            )),
+      )
     ],
   );
 }
 
-Widget imageFromExternal(String url, {double height = 100.0, double width = 60.0}) {
+Widget imageFromExternal(String url, {double height = 100.0, double width = 60.0, bool isEnabled = true}) {
   double radiusCard = 8.0;
   return SizedBox(
       width: width,
@@ -58,22 +69,24 @@ Widget imageFromExternal(String url, {double height = 100.0, double width = 60.0
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(radiusCard),
           ),
-          child: Center(
-              child: ClipRRect(
-                  borderRadius: BorderRadius.circular(radiusCard),
-                  child: Image.network(url, width: width, height: height, fit: BoxFit.cover,
-                      loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? event) {
-                    if (event == null) return child;
-                    var progress = event.expectedTotalBytes != null ? (event.cumulativeBytesLoaded / event.expectedTotalBytes!) : null;
-                    return (CircularProgressIndicator.adaptive(
-                      value: progress,
-                    ));
-                  }, errorBuilder: (BuildContext context, Object object, StackTrace? stackTrace) {
-                    return const Icon(
-                      Icons.error,
-                      color: Colors.red,
-                    );
-                  })))));
+          child: Opacity(
+              opacity: isEnabled ? 1.0 : 0.5,
+              child: Center(
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.circular(radiusCard),
+                      child: Image.network(url, width: width, height: height, fit: BoxFit.cover,
+                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? event) {
+                        if (event == null) return child;
+                        var progress = event.expectedTotalBytes != null ? (event.cumulativeBytesLoaded / event.expectedTotalBytes!) : null;
+                        return (CircularProgressIndicator.adaptive(
+                          value: progress,
+                        ));
+                      }, errorBuilder: (BuildContext context, Object object, StackTrace? stackTrace) {
+                        return const Icon(
+                          Icons.error,
+                          color: Colors.red,
+                        );
+                      }))))));
 }
 
 Widget showErrorScreen(String error) {
