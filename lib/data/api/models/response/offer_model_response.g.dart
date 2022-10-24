@@ -25,6 +25,9 @@ OfferResponse _$OfferResponseFromJson(Map<String, dynamic> json) =>
       apiStatusId: json['api_status_id'] as int,
       mobileStatus: json['mobile_status'] as int,
       statusMessage: json['mobile_status_text'] as String,
+      currency: json['currency'] as String?,
+      uiState: OfferResponse._convertToUiState(json['ui_state'] as int),
+      borderColor: json['color_border'] as String?,
     );
 
 Map<String, dynamic> _$OfferResponseToJson(OfferResponse instance) =>
@@ -42,6 +45,9 @@ Map<String, dynamic> _$OfferResponseToJson(OfferResponse instance) =>
       'api_status_id': instance.apiStatusId,
       'mobile_status': instance.mobileStatus,
       'mobile_status_text': instance.statusMessage,
+      'currency': instance.currency,
+      'ui_state': OfferResponse._convertFromUiState(instance.uiState),
+      'color_border': instance.borderColor,
     };
 
 CreatedOffer _$CreatedOfferFromJson(Map<String, dynamic> json) => CreatedOffer(

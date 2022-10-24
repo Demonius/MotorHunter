@@ -243,7 +243,7 @@ class _OrderPage extends State<OrderPage> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(format('{:.2f}', order.price ?? 0.0)),
+                  Text(format('{:.2f}' '{}', order.price ?? 0.0, order.currency)),
                   Visibility(visible: isVisibleApproveButton, child: const SizedBox(width: 8.0)),
                   Visibility(
                       visible: isVisibleApproveButton,

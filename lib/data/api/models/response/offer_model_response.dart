@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:motor_hunter/data/api/models/response/error_model.dart';
+
+import '../object/offer_model.dart';
 
 part 'offer_model_response.g.dart';
 /**
@@ -61,6 +62,15 @@ class OfferResponse {
   @JsonKey(name: "mobile_status_text")
   String statusMessage;
 
+  @JsonKey(name: "currency")
+  String? currency;
+
+  @JsonKey(name: "ui_state", fromJson: _convertToUiState, toJson: _convertFromUiState)
+  UiState uiState;
+
+  @JsonKey(name: "color_border")
+  String? borderColor;
+
   OfferResponse(
       {required this.id,
       this.image,
@@ -74,7 +84,10 @@ class OfferResponse {
       this.price,
       required this.apiStatusId,
       required this.mobileStatus,
-      required this.statusMessage});
+      required this.statusMessage,
+      this.currency,
+      required this.uiState,
+      this.borderColor});
 
   factory OfferResponse.fromJson(Map<String, dynamic> json) => _$OfferResponseFromJson(json);
 
@@ -93,6 +106,28 @@ class OfferResponse {
   static String _doubleToString(double? value) => value.toString() ?? "";
 
   static DateTime _stringToDateTime(String date) => DateTime.parse(date);
+
+  static UiState _convertToUiState(int state) {
+    switch (state) {
+      case 1:
+        return UiState.notActive;
+      case 2:
+        return UiState.borderColor;
+      default:
+        return UiState.basic;
+    }
+  }
+
+  static int _convertFromUiState(UiState state) {
+    switch (state) {
+      case UiState.basic:
+        return 0;
+      case UiState.notActive:
+        return 1;
+      case UiState.borderColor:
+        return 2;
+    }
+  }
 }
 
 /**

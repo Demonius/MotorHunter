@@ -18,6 +18,7 @@ class Offer {
   int idStatus;
   UiState uiState;
   int? colorBorder;
+  String? currency;
 
   Offer(
       {required this.id,
@@ -33,11 +34,16 @@ class Offer {
       required this.messageStatus,
       required this.idStatus,
       this.uiState = UiState.basic,
-      this.colorBorder});
+      this.colorBorder,
+      this.currency});
 
   factory Offer.fromJson(Map<String, dynamic> json) => _$OfferFromJson(json);
 
   Map<String, dynamic> toJson() => _$OfferToJson(this);
 }
 
-enum UiState { basic, notActive, borderColor }
+enum UiState {
+  basic,
+  notActive,
+  borderColor;
+}

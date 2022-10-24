@@ -22,7 +22,8 @@ Offer _$OfferFromJson(Map<String, dynamic> json) => Offer(
       idStatus: json['idStatus'] as int,
       uiState: $enumDecodeNullable(_$UiStateEnumMap, json['uiState']) ??
           UiState.basic,
-      colorBorder: json['colorBorder'] as int? ?? 0xFFF44336,
+      colorBorder: json['colorBorder'] as int?,
+      currency: json['currency'] as String?,
     );
 
 Map<String, dynamic> _$OfferToJson(Offer instance) => <String, dynamic>{
@@ -40,6 +41,7 @@ Map<String, dynamic> _$OfferToJson(Offer instance) => <String, dynamic>{
       'idStatus': instance.idStatus,
       'uiState': _$UiStateEnumMap[instance.uiState]!,
       'colorBorder': instance.colorBorder,
+      'currency': instance.currency,
     };
 
 const _$UiStateEnumMap = {

@@ -21,8 +21,9 @@ class Mappers {
       price: offerResponse.price,
       messageStatus: offerResponse.statusMessage,
       idStatus: offerResponse.mobileStatus,
-      uiState: UiState.borderColor,
-      colorBorder: 0xFFF44336);//0xFFF44336
+      uiState: offerResponse.uiState,
+      colorBorder: offerResponse.borderColor != null ? int.tryParse(offerResponse.borderColor!) : null,
+      currency: offerResponse.currency);
 
   String convertDateToString(DateTime currentDateTime) {
     DateFormat dateFormat = DateFormat("dd-MM-yyyy HH:mm:ss");
