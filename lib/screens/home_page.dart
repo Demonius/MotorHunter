@@ -274,7 +274,6 @@ class _HomePage extends State<HomePage> {
     Color borderColor = offer.colorBorder == null ? Colors.transparent : Color(offer.colorBorder!);
 
     bool isEnabled = offer.uiState != UiState.notActive;
-    print("UiState for card => ${offer.uiState}");
     return Card(
         shape: RoundedRectangleBorder(
           side: BorderSide(width: 2, color: borderColor),

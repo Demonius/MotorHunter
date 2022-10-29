@@ -34,5 +34,6 @@ abstract class ApiClient {
 
   @FormUrlEncoded()
   @POST(Apis.price_approve)
-  Future<ApproveOffer> approveOfferPrice(@Field("offer_id") int offerId, @Field("approve") int approve, @Field("supplier_comment") String comment);
+  Future<ApproveOffer> approveOfferPrice(
+      @Field("offer_id") int offerId, @Field("new_price") String newPrice, @Field("supplier_comment") String comment);
 }

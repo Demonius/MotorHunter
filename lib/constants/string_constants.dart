@@ -8,6 +8,7 @@ class StringResources {
   static const String textApproveButton = "Approve";
   static const String textRegistrationButton = "Sign in";
   static const String textForgotPassword = "Forgot password";
+  static const String textHintPrice = "Enter your price if it will needed";
   static const String textHintDescription = "Enter description for offer";
   static const String textHintDescriptionApprovePrice = "Enter description for your price";
 
@@ -37,6 +38,10 @@ class StringResources {
 
   static const String titleDialogPriceApprove = "Approve price";
   static const String descriptionDialogPriceApprove = "Approve current price or change price or decline price with comment";
+  static const String textCurrentPrice = "Current price";
+  static const String labelYourPrice = "New price";
+  static const String labelDescription = "Description";
+  static const String setNewPriceButton = "Set price";
 
   static const String errorEmptyDescription = "Field description can not be empty";
   static const String errorEmptyPrice = "Field description can not be empty";

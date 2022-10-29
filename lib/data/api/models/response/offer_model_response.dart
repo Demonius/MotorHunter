@@ -3,23 +3,6 @@ import 'package:json_annotation/json_annotation.dart';
 import '../object/offer_model.dart';
 
 part 'offer_model_response.g.dart';
-/**
-    {
-    "id": 81,
-    "image": "https://api.motor-hunter.com/images/offers/offer_1653653350.jpg",
-    "license_plate": "ya55fbe",
-    "created_at": "2022-05-27T12:09:10.000000Z",
-    "offer_price": "299.00",
-    "api_status_id": 15,
-    "manager_comment": null,
-    "supplier_comment": null,
-    "is_requested_media": 0,
-    "photos": "[\"\\/images\\/offers\\/offer_image_upload_16612569870.jpg\"]",
-    "video": "/images/offers/offer_video_1657632604.mp4"
-    "mobile_status": 5,
-    "mobile_status_text": "Placed for sale"
-    }
- */
 
 @JsonSerializable()
 class OfferResponse {
@@ -35,7 +18,7 @@ class OfferResponse {
   @JsonKey(name: "created_at", fromJson: _stringToDateTime)
   DateTime createdAt;
 
-  @JsonKey(name: "is_requested_media", fromJson: _intToBool, toJson: _boolToInt)
+  @JsonKey(name: "is_requested_media", defaultValue: 0, fromJson: _intToBool, toJson: _boolToInt)
   bool isRequestedMedia;
 
   @JsonKey(name: "manager_comment")
@@ -53,7 +36,7 @@ class OfferResponse {
   @JsonKey(name: "offer_price", defaultValue: 0.0, fromJson: _stringToDouble, toJson: _doubleToString)
   double? price;
 
-  @JsonKey(name: "api_status_id")
+  @JsonKey(name: "api_status_id", defaultValue: 0)
   int apiStatusId;
 
   @JsonKey(name: "mobile_status")
@@ -65,7 +48,7 @@ class OfferResponse {
   @JsonKey(name: "currency")
   String? currency;
 
-  @JsonKey(name: "ui_state", fromJson: _convertToUiState, toJson: _convertFromUiState)
+  @JsonKey(name: "ui_state", defaultValue: 0, fromJson: _convertToUiState, toJson: _convertFromUiState)
   UiState uiState;
 
   @JsonKey(name: "color_border")
@@ -107,7 +90,7 @@ class OfferResponse {
 
   static DateTime _stringToDateTime(String date) => DateTime.parse(date);
 
-  static UiState _convertToUiState(int state) {
+  static UiState _convertToUiState(int? state) {
     switch (state) {
       case 1:
         return UiState.notActive;
@@ -130,19 +113,6 @@ class OfferResponse {
   }
 }
 
-/**
-    {
-    "is_active": 1,
-    "image": "/images/offers/offer_1659102225.jpg",
-    "offer_status_id": 1,
-    "api_status_id": 5,
-    "supplier_comment": null,
-    "supplier_id": "21",
-    "updated_at": "2022-07-29T13:43:45.000000Z",
-    "created_at": "2022-07-29T13:43:45.000000Z",
-    "id": 98
-    }
- */
 @JsonSerializable()
 class CreatedOffer {
   // @JsonKey(name: "isActive", fromJson: OfferResponse._intToBool, toJson: OfferResponse._boolToInt)

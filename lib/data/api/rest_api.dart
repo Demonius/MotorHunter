@@ -63,7 +63,7 @@ class Apis {
     return prefManager.getCurrentUserId().then((int userId) => client.createOffer(userId, file, description));
   }
 
-  Future<ApproveOffer> approveOfferPrice(int offerId, bool approve, String comment) => client.approveOfferPrice(offerId, approve ? 1 : 0, comment);
+  Future<ApproveOffer> approveOfferPrice(int offerId, String newPrice, String comment) => client.approveOfferPrice(offerId, newPrice, comment);
 }
 
 class MotorHunterInterceptor extends Interceptor {

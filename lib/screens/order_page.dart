@@ -7,6 +7,7 @@ import 'package:motor_hunter/base/widgets.dart';
 import 'package:motor_hunter/data/api/models/response/offer_model_response.dart';
 import 'package:motor_hunter/data/api/rest_api.dart';
 import 'package:motor_hunter/data/clients/mappers.dart';
+import 'package:motor_hunter/screens/dialog_approve_price.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:video_player/video_player.dart';
 
@@ -29,22 +30,20 @@ class _OrderPage extends State<OrderPage> {
   late VideoPlayerController _controller;
   late Future initVideoPlayerController;
 
-  TextEditingController controllerPrice = TextEditingController();
-
   final double paddingMessage = 30.0;
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
 
-  String description = "";
   double price = 0.0;
   bool isApproveLoad = false;
   bool isReloadList = false;
   late bool isVisibleApproveButton;
 
+  String textApproveButton = StringResources.approve;
+
   @override
   void initState() {
     order = widget.order;
     super.initState();
-    price = order.price ?? 0.0;
     _controller = VideoPlayerController.network(order.video ?? "");
     initVideoPlayerController = _controller.initialize();
     isVisibleApproveButton = order.idStatus == 4;
@@ -99,119 +98,11 @@ class _OrderPage extends State<OrderPage> {
             )));
   }
 
-  void _onDescriptionTextChange(String text) {
-    description = text;
-  }
-
-  void _onPriceTextChange(String text) {
-    if (text.isEmpty) return;
-    order.price = double.parse(text);
-  }
-
-  void _onClickApprovePrice() {
-    TextButton cancelButton = TextButton(
-      style: TextButton.styleFrom(primary: Colors.black),
-      onPressed: () {
-        if (isApproveLoad) return;
-        Navigator.pop(context);
-      },
-      child: const Text(StringResources.cancel),
-    );
-
-    TextButton declineButton = TextButton(
-      style: TextButton.styleFrom(primary: primaryColor),
-      onPressed: () {
-        if (isApproveLoad) return;
-        if (description.isEmpty) {
-          showErrorSnackBar(context, StringResources.errorEmptyDescription);
-          return;
-        }
-        FocusManager.instance.primaryFocus?.unfocus();
-        Apis().approveOfferPrice(order.id, false, description).then((value) {
-          Navigator.pop(context);
-          _onRefresh();
-          isReloadList = true;
-          setState(() {
-            isApproveLoad = true;
-            isVisibleApproveButton = false;
-          });
-        }).catchError((error) {
-          showErrorSnackBar(context, error.toString());
-          setState(() {
-            isApproveLoad = false;
-          });
-        });
-      },
-      child: const Text(StringResources.decline),
-    );
-
-    TextButton approveButton = TextButton(
-      style: styleAdditionalButton(),
-      onPressed: () {
-        if (isApproveLoad) return;
-
-        if (price != order.price) {
-          showErrorSnackBar(context, StringResources.errorPriceApprove);
-          return;
-        }
-        FocusManager.instance.primaryFocus?.unfocus();
-        Apis().approveOfferPrice(order.id, true, description).then((value) {
-          Navigator.pop(context);
-          _onRefresh();
-          isReloadList = true;
-          setState(() {
-            isApproveLoad = true;
-            isVisibleApproveButton = false;
-          });
-        }).catchError((error) {
-          showErrorSnackBar(context, error.toString());
-          setState(() {
-            isApproveLoad = false;
-          });
-        });
-      },
-      child: const Text(StringResources.approve),
-    );
-    controllerPrice.text = price.toString();
-
-    AlertDialog approveDialog = AlertDialog(
-      title: const Text(StringResources.titleDialogPriceApprove),
-      content: SingleChildScrollView(
-          child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(StringResources.descriptionDialogPriceApprove),
-          const SizedBox(
-            height: 8.0,
-          ),
-          TextField(
-            controller: controllerPrice,
-            keyboardType: TextInputType.number,
-            onChanged: _onPriceTextChange,
-            obscureText: false,
-            textInputAction: TextInputAction.done,
-          ),
-          SizedBox(
-              height: 120.0,
-              child: TextField(
-                keyboardType: TextInputType.multiline,
-                maxLines: 7,
-                onChanged: _onDescriptionTextChange,
-                textInputAction: TextInputAction.done,
-                decoration: const InputDecoration(hintText: StringResources.textHintDescription, helperText: StringResources.textHelperPassword),
-              )),
-          Visibility(
-              visible: isApproveLoad,
-              child: const CupertinoActivityIndicator(
-                color: Colors.white,
-                radius: 12.0,
-              ))
-        ],
-      )),
-      actions: [cancelButton, declineButton, approveButton],
-    );
-
-    showDialog(context: context, builder: (BuildContext context) => approveDialog);
+  Future<void> _onClickApprovePrice() async {
+    var result = await showDialog<bool>(context: context, builder: (BuildContext context) => DialogApprovePrice(order: order));
+    if (result == true) {
+      _onRefresh();
+    }
   }
 
   Widget setOfferData() => SmartRefresher(
@@ -224,9 +115,6 @@ class _OrderPage extends State<OrderPage> {
       child: ListView(
         children: [
           createWidgetTitleValue("Comment order:", order.managerComment ?? "No comment"),
-          // const SizedBox(
-          //   height: 8.0,
-          // ),
           createDivider(),
           createWidgetTitleValue("Status order:", order.messageStatus, colorBorder: order.colorBorder),
           createDivider(),
