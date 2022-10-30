@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dio_logging_interceptor/dio_logging_interceptor.dart';
-import 'package:motor_hunter/data/api/models/response/error_model.dart';
 import 'package:motor_hunter/data/api/models/response/offer_model_response.dart';
 import 'package:motor_hunter/data/clients/mappers.dart';
 import 'package:motor_hunter/managers/shared_pref_manager.dart';
@@ -23,13 +22,15 @@ class Apis {
   static const String update = "offer/update";
   static const String price_approve = "offer/approve";
 
+  static const int timeout = 90000;
+
   static late BaseOptions baseOptions;
   static late Dio dio;
   static late ApiClient client;
   static SharedPrefManager prefManager = SharedPrefManager();
 
   static void initBaseService() async {
-    baseOptions = BaseOptions(contentType: "application/json", followRedirects: true, connectTimeout: 9000, receiveTimeout: 9000);
+    baseOptions = BaseOptions(contentType: "application/json", followRedirects: true, connectTimeout: timeout, receiveTimeout: timeout);
     dio = Dio(baseOptions);
     dio.interceptors.add(DioLoggingInterceptor(level: Level.body, compact: false));
     dio.interceptors.add(MotorHunterInterceptor());

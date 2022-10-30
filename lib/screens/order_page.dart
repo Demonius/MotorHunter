@@ -101,7 +101,7 @@ class _OrderPage extends State<OrderPage> {
   Future<void> _onClickApprovePrice() async {
     var result = await showDialog<bool>(context: context, builder: (BuildContext context) => DialogApprovePrice(order: order));
     if (result == true) {
-      _onRefresh();
+      _refreshController.requestRefresh();
     }
   }
 
