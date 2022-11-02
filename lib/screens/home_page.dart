@@ -101,7 +101,6 @@ class _HomePage extends State<HomePage> {
   void initialization() async {
     isVisibleFab = false;
     isInitializationState = true;
-    startTimer();
   }
 
   @override
@@ -120,7 +119,7 @@ class _HomePage extends State<HomePage> {
         setState(() {
           endOfTime = AppConstants.intervalUpdateData;
         });
-        _refreshController.requestRefresh();
+        _onRefresh();
         startTimer();
       }
     });
@@ -136,8 +135,8 @@ class _HomePage extends State<HomePage> {
         if (value.isEmpty) {
           _refreshController.loadNoData();
         }
-        startTimer();
       });
+      startTimer();
     }).catchError((error) {
       catchErrorListOffer(error);
       _refreshController.loadFailed();
@@ -170,6 +169,7 @@ class _HomePage extends State<HomePage> {
 
       if (isInitializationState) {
         FlutterNativeSplash.remove();
+        startTimer();
         isInitializationState = false;
       }
     }).catchError((error) {
@@ -195,10 +195,7 @@ class _HomePage extends State<HomePage> {
         appBar: defaultAppBar(actions: [actionExit]),
         floatingActionButton: Visibility(visible: isVisibleFab, child: addFloatingActionButton("AddNewCar", _addNewOffer)),
         body: Stack(children: [
-          Align(
-              alignment: Alignment.topRight,
-              child: Padding(padding: const EdgeInsets.only(top: 4.0, right: 8.0), child: Text("refresh after $endOfTime s"))),
-          Padding(
+         Padding(
               padding: const EdgeInsets.only(top: 16.0),
               child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
                 return SmartRefresher(

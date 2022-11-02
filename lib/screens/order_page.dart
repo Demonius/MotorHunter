@@ -57,6 +57,7 @@ class _OrderPage extends State<OrderPage> {
       offer.id = order.id;
       setState(() {
         order = Mappers().mapOffers(offer);
+        isVisibleApproveButton = order.idStatus == 4;
       });
       _refreshController.refreshCompleted();
     }).catchError((error) {

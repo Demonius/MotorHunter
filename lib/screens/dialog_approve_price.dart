@@ -67,7 +67,7 @@ class _DialogApprovePrice extends State<DialogApprovePrice> {
                     controller: textControllerPrice,
                     keyboardType: TextInputType.number,
                     obscureText: false,
-                    textInputAction: TextInputAction.done,
+                    textInputAction: TextInputAction.next,
                     onChanged: (text) {
                       if (text.isEmpty) {
                         price = 0.0;
