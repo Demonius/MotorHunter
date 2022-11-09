@@ -34,7 +34,8 @@ void showErrorSnackBar(BuildContext context, String text) {
   ScaffoldMessenger.of(context).showSnackBar(snackBar);
 }
 
-Widget createWidgetTitleValue(String title, String value, {CrossAxisAlignment alignment = CrossAxisAlignment.end, int? colorBorder}) {
+Widget createWidgetTitleValue(String title, String value,
+    {CrossAxisAlignment alignment = CrossAxisAlignment.end, int? colorBorder, bool isBold = false}) {
   return Row(
     verticalDirection: VerticalDirection.up,
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,7 +53,10 @@ Widget createWidgetTitleValue(String title, String value, {CrossAxisAlignment al
             alignment: Alignment.centerRight,
             child: Text(
               value,
-              style: TextStyle(color: colorBorder != null ? Color(colorBorder) : Colors.black),
+              style: TextStyle(
+                color: colorBorder != null ? Color(colorBorder) : Colors.black,
+                fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              ),
             )),
       )
     ],

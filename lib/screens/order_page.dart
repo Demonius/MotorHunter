@@ -117,7 +117,7 @@ class _OrderPage extends State<OrderPage> {
         children: [
           createWidgetTitleValue("Comment order:", order.managerComment ?? "No comment"),
           createDivider(),
-          createWidgetTitleValue("Status order:", order.messageStatus, colorBorder: order.colorBorder),
+          createWidgetTitleValue("Status order:", order.messageStatus, colorBorder: order.colorBorder, isBold: order.colorBorder != null),
           createDivider(),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

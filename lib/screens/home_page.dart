@@ -106,7 +106,9 @@ class _HomePage extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
-    timerUpdate.cancel();
+    if (timerUpdate.isActive) {
+      timerUpdate.cancel();
+    }
   }
 
   void startTimer() {
@@ -195,8 +197,8 @@ class _HomePage extends State<HomePage> {
         appBar: defaultAppBar(actions: [actionExit]),
         floatingActionButton: Visibility(visible: isVisibleFab, child: addFloatingActionButton("AddNewCar", _addNewOffer)),
         body: Stack(children: [
-         Padding(
-              padding: const EdgeInsets.only(top: 16.0),
+          Padding(
+              padding: const EdgeInsets.all(4.0),
               child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
                 return SmartRefresher(
                   enablePullDown: true,
@@ -269,15 +271,15 @@ class _HomePage extends State<HomePage> {
 
   Widget createCardOffer(Offer offer) {
     Color borderColor = offer.colorBorder == null ? Colors.transparent : Color(offer.colorBorder!);
-
+    bool isColored = offer.colorBorder != null;
     bool isEnabled = offer.uiState != UiState.notActive;
     return Card(
         shape: RoundedRectangleBorder(
-          side: BorderSide(width: 2, color: borderColor),
+          side: BorderSide(width: 4, color: borderColor),
           borderRadius: BorderRadius.circular(4.0),
         ),
         child: Container(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.all(8.0),
             child: Row(children: [
               imageFromExternal(offer.image, height: 90.0, isEnabled: isEnabled),
               const SizedBox(width: 12.0),
@@ -288,7 +290,7 @@ class _HomePage extends State<HomePage> {
                         children: [
                           createWidgetTitleValue("License plate:", offer.licensePlate),
                           const SizedBox(height: 5.0),
-                          createWidgetTitleValue("Status:", offer.messageStatus, colorBorder: offer.colorBorder),
+                          createWidgetTitleValue("Status:", offer.messageStatus, colorBorder: offer.colorBorder, isBold: isColored),
                           const SizedBox(height: 5.0),
                           const Spacer(),
                           Align(alignment: Alignment.bottomRight, child: Text(Mappers().convertDateToString(offer.createdAt)))
